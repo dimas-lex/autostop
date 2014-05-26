@@ -9,7 +9,7 @@ from auto.models import Driver
 from auto.models import AUser
 from auto.models import Car
 
-class UserResource(ModelResource):
+class AUserResource(ModelResource):
     class Meta:
         queryset = AUser.objects.filter(is_staff=False)
         resource_name = 'user'
@@ -19,17 +19,17 @@ class UserResource(ModelResource):
         }
 
 
-class EntryResource(ModelResource):
-    user = fields.ForeignKey(UserResource, 'user')
+# class EntryResource(ModelResource):
+#     user = fields.ForeignKey(UserResource, 'user')
 
-    class Meta:
-        queryset = Car.objects.all()
-        resource_name = 'entry'
-        authorization = Authorization()
-        filtering = {
-            'user': ALL_WITH_RELATIONS,
-            'pub_date': ['exact', 'lt', 'lte', 'gte', 'gt'],
-        }
+#     class Meta:
+#         queryset = Car.objects.all()
+#         resource_name = 'entry'
+#         authorization = Authorization()
+#         filtering = {
+#             'user': ALL_WITH_RELATIONS,
+#             'pub_date': ['exact', 'lt', 'lte', 'gte', 'gt'],
+#         }
 
 
 # class UserResource(ModelResource):
