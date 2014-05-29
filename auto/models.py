@@ -72,3 +72,18 @@ class Car(models.Model):
                                     validators=[MinValueValidator(2),
                                                 MaxValueValidator(50)])
 
+
+class Race(models.Model):
+    """
+    Race - A one race which was created and driven by car's owner
+    """
+    owner = models.ForeignKey(AUser, related_name='races')
+    car = models.ForeignKey(Car, related_name='races')
+    time =  models.DateTimeField()
+    available_seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="available seats with driver", help_text="",
+                                    validators=[MinValueValidator(2),
+                                                MaxValueValidator(50)])
+    city_from = models.CharField(_('city from'), max_length=30, blank=True)
+    city_to = models.CharField(_('destination city'), max_length=30, blank=True)
+    completed = models.BooleanField(_('active'), default=True)
+    follower = models.ForeignKey(AUser, related_name='trips')

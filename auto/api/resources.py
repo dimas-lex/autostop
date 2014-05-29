@@ -5,9 +5,10 @@ from tastypie.resources import ModelResource
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-from auto.models import Driver
+# from auto.models import Driver
 from auto.models import AUser
 from auto.models import Car
+from auto.models import Race
 
 class AUserResource(ModelResource):
     class Meta:
@@ -18,7 +19,15 @@ class AUserResource(ModelResource):
             'username': ALL,
         }
 
+class CarResource(ModelResource):
+    class Meta:
+        queryset = Car.objects.all()
+        resource_name = 'car'
 
+class RaceResource(ModelResource):
+    class Meta:
+        queryset = Race.objects.all()
+        resource_name = 'race'
 # class EntryResource(ModelResource):
 #     user = fields.ForeignKey(UserResource, 'user')
 
