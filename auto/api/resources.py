@@ -5,7 +5,7 @@ from tastypie.resources import ModelResource
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-# from auto.models import Driver
+
 from auto.models import AUser
 from auto.models import Car
 from auto.models import Race
@@ -16,7 +16,7 @@ class AUserResource(ModelResource):
         resource_name = 'user'
         excludes = ['email', 'password', 'is_active', 'is_staff', 'is_superuser']
         filtering = {
-            'username': ALL,
+            'last_name': ALL,
         }
 
 class CarResource(ModelResource):
