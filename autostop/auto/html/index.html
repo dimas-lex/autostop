@@ -60,7 +60,11 @@
         </div>
         <div class="panel-footer">
             <div class="container-fluid ">
-                <div class="btn btn-default btn-lg pull-left">
+                <div
+                class="btn btn-default btn-lg pull-left"
+                ng-click="loadData(meta.offset - meta.limit)"
+                ng-class="meta.offset === 0 ? 'disabled' : '' "
+                >
                     <a class="glyphicon glyphicon-chevron-left   center-block " href="#" >Prev</a>
                 </div>
                 <div class="center-block " style="width:300px;">
@@ -74,8 +78,12 @@
                         </button>
                     </div>
                 </div>
-                <div class="btn btn-default btn-lg pull-right">
-                    <a class="glyphicon glyphicon-chevron-right  center-block " href="#" >Next</a>
+                <div
+                class="btn btn-default btn-lg pull-right"
+                ng-click="loadData(meta.offset + meta.limit)"
+                ng-class="(meta.offset + meta.limit) > meta.total_count ? 'disabled' : '' "
+                >
+                    <a class="glyphicon glyphicon-chevron-right  center-block " href="#"  >Next</a>
                 </div>
             </div>
         </div>
@@ -138,10 +146,10 @@
         AutoApp.controller('AccountListCtrl',
             function($scope, $http, dataExchangeService, messageService) {
 
-                $scope.loadData = function() {
+                $scope.loadData = function(offset) {
                     $http.get('/api/v1/user/', {
                         params: {
-                            offset: 0
+                            offset: offset && offset > 0 ? offset : 0
                         }
 
                     }).success(function(data) {
