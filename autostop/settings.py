@@ -21,11 +21,12 @@ SECRET_KEY = '=o=qg#-+*(z+7lb+tu$aqu(%=_xmzs1(-kby!-9ugb-pmdy-bs'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TASTYPIE_FULL_DEBUG = True
 
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
-AUTH_USER_MODEL = 'auto.AUser'
+AUTH_USER_MODEL = 'autostop.auto.AUser'
 
 # Application definition
 TASTYPIE_FULL_DEBUG = True
@@ -37,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'auto',
+    'autostop.auto',
     'tastypie',
 )
 
@@ -55,8 +56,9 @@ ROOT_URLCONF = 'autostop.urls'
 WSGI_APPLICATION = 'autostop.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, "auto/templates/"),
-    # '/home/yana/code/autostop/osb/billing/',
+    os.path.join(BASE_DIR, "autostop/templates/"),
+    os.path.join(BASE_DIR, "autostop/auto/"),
+
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -104,7 +106,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "autostop/static"),
+)
 
 LOGGING = {
     'version': 1,
@@ -137,7 +141,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'osb': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+        'autostop': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
             'handlers': ['log_file'],
             'level': 'DEBUG',
             'propagate': True,

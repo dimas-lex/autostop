@@ -6,9 +6,11 @@ from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
-from auto.models import AUser
-from auto.models import Car
-from auto.models import Race
+from autostop.auto.models import AUser
+from autostop.auto.models import Car
+from autostop.auto.models import Race
+import logging,  json
+logger = logging.getLogger('autostop')
 
 class AUserResource(ModelResource):
     class Meta:
@@ -18,6 +20,23 @@ class AUserResource(ModelResource):
         filtering = {
             'last_name': ALL,
         }
+        authorization = Authorization()
+
+    def full_hydrate(self, bundle):
+        logger.debug('full_hydrate')
+        if bundle.request.META['REQUEST_METHOD'] == 'POST':
+            bundle.data = bundle.data.copy()
+        logger.debug(bundle)
+        return bundle
+
+    def alter_detail_data_to_serialize( self, request, data ):
+        logger.debug('alter_detail_data_to_serialize')
+        if request.method == 'POST':
+            data.data = {
+                key : value for key, value in data.data.copy().iteritems() if \
+                key not in self._meta.post_excludes }
+        return data
+
 
 class CarResource(ModelResource):
     class Meta:
