@@ -1,14 +1,11 @@
 # from django.contrib.auth.models import User
+from autostop.auto.models import AUser, Car, Race
 from tastypie.cache import SimpleCache
 from tastypie import fields
 from tastypie.resources import ModelResource, Resource
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-
-from autostop.auto.models import AUser
-from autostop.auto.models import Car
-from autostop.auto.models import Race
 
 from autostop.settings import API_LIMIT_PER_PAGE
 from autostop.auto.services.UserServices import AUserService

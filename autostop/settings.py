@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+# from autostop.auto.models import AUser
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -27,7 +28,7 @@ TEMPLATE_DEBUG = True
 API_LIMIT_PER_PAGE = 3
 
 ALLOWED_HOSTS = []
-AUTH_USER_MODEL = 'autostop.auto.AUser'
+AUTH_USER_MODEL = 'auto.AUser'
 
 # Application definition
 TASTYPIE_FULL_DEBUG = True

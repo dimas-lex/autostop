@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from datetime import date
 from django.core.validators import MaxValueValidator, MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
@@ -38,6 +38,7 @@ class AUser(AbstractBaseUser, PermissionsMixin):
     second_phone = PhoneNumberField()
     avatar_id = models.CharField(_('avatar'), max_length=300, blank=True)
 
+    objects = UserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -65,48 +66,48 @@ class AUser(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email])
 
-# class Images(models.Model):
-#     title = models.CharField(max_length = 100)
-#     image = models.ImageField(upload_to ="photos/originals/%Y/%m/")
-#     image_height = models.IntegerField()
-#     image_width = models.IntegerField()
-#     thumbnail = models.ImageField(upload_to="photos/thumbs/%Y/%m/")
-#     thumbnail_height = models.IntegerField()
-#     thumbnail_width = models.IntegerField()
-#     caption = models.CharField(max_length = 250, blank =True)
+class Images(models.Model):
+    title = models.CharField(max_length = 100)
+    image = models.ImageField(upload_to ="photos/originals/%Y/%m/")
+    image_height = models.IntegerField()
+    image_width = models.IntegerField()
+    thumbnail = models.ImageField(upload_to="photos/thumbs/%Y/%m/")
+    thumbnail_height = models.IntegerField()
+    thumbnail_width = models.IntegerField()
+    caption = models.CharField(max_length = 250, blank =True)
 
-#     def __str__(self):
-#         return "%s"%self.title
+    def __str__(self):
+        return "%s"%self.title
 
-#     def __unicode__(self):
-#         return self.title
+    def __unicode__(self):
+        return self.title
 
-#     def save(self, force_update=False, force_insert=False, thumb_size=(180,300)):
+    def save(self, force_update=False, force_insert=False, thumb_size=(180,300)):
 
-#         image = Image.open(self.image)
+        image = Image.open(self.image)
 
-#         if image.mode not in ('L', 'RGB'):
-#             image = image.convert('RGB')
+        if image.mode not in ('L', 'RGB'):
+            image = image.convert('RGB')
 
-#         # save the original size
-#         self.image_width, self.image_height = image.size
+        # save the original size
+        self.image_width, self.image_height = image.size
 
-#         image.thumbnail(thumb_size, Image.ANTIALIAS)
+        image.thumbnail(thumb_size, Image.ANTIALIAS)
 
-#         # save the thumbnail to memory
-#         temp_handle = StringIO()
-#         image.save(temp_handle, 'png')
-#         temp_handle.seek(0) # rewind the file
+        # save the thumbnail to memory
+        temp_handle = StringIO()
+        image.save(temp_handle, 'png')
+        temp_handle.seek(0) # rewind the file
 
-#         # save to the thumbnail field
-#         suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
-#                                  temp_handle.read(),
-#                                  content_type='image/png')
-#         self.thumbnail.save(suf.name+'.png', suf, save=False)
-#         self.thumbnail_width, self.thumbnail_height = image.size
+        # save to the thumbnail field
+        suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
+                                 temp_handle.read(),
+                                 content_type='image/png')
+        self.thumbnail.save(suf.name+'.png', suf, save=False)
+        self.thumbnail_width, self.thumbnail_height = image.size
 
-#         # save the image object
-#         super(Images, self).save(force_update, force_insert)
+        # save the image object
+        super(Images, self).save(force_update, force_insert)
 
 class Car(models.Model):
     """
@@ -123,9 +124,11 @@ class Car(models.Model):
     seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="available seats with driver", help_text="",
                                     validators=[MinValueValidator(2),
                                                 MaxValueValidator(50)])
+
+
 class City(models.Model):
     """
-    City -
+    City - source or destination city
     """
     name = models.CharField(_('city name'), max_length=255)
     latitude = models.FloatField(blank=True, null=True,   verbose_name="latitude of the city")
@@ -146,8 +149,8 @@ class Race(models.Model):
                                     validators=[MinValueValidator(2),
                                                 MaxValueValidator(50)])
 
-    city_from = models.ForeignKey(City)
-    city_to = models.ForeignKey(City)
+    city_from = models.ForeignKey(City, related_name="races_from")
+    city_to = models.ForeignKey(City, related_name="races_to")
 
     completed = models.BooleanField(_('active'), default=True)
     follower = models.ForeignKey(AUser, related_name='trips')
