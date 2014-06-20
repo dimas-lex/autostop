@@ -1,7 +1,7 @@
 # from django.contrib.auth.models import User
 from tastypie.cache import SimpleCache
 from tastypie import fields
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, Resource
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
@@ -9,6 +9,9 @@ from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from autostop.auto.models import AUser
 from autostop.auto.models import Car
 from autostop.auto.models import Race
+
+from autostop.auto.services.UserServices import AUserService
+
 import logging,  json
 logger = logging.getLogger('autostop')
 
@@ -16,27 +19,43 @@ class AUserResource(ModelResource):
     class Meta:
         queryset = AUser.objects.filter(is_staff=False)
         resource_name = 'user'
-        excludes = ['email', 'password', 'is_active', 'is_staff', 'is_superuser']
+        excludes = ['is_active', 'is_staff', 'is_superuser']
         filtering = {
             'last_name': ALL,
         }
         authorization = Authorization()
 
-    def full_hydrate(self, bundle):
-        logger.debug('full_hydrate')
-        if bundle.request.META['REQUEST_METHOD'] == 'POST':
-            bundle.data = bundle.data.copy()
-        logger.debug(bundle)
-        return bundle
+    # def dehydrate_password(self, bundle):
+    #     return ''
 
-    def alter_detail_data_to_serialize( self, request, data ):
-        logger.debug('alter_detail_data_to_serialize')
-        if request.method == 'POST':
-            data.data = {
-                key : value for key, value in data.data.copy().iteritems() if \
-                key not in self._meta.post_excludes }
-        return data
+    # def dehydrate_email(self, bundle):
+    #     if bundle.request.user.pk == bundle.obj.pk:
+    #         # Note that there isn't an ``email`` field on the ``Resource``.
+    #         # By this time, it doesn't matter, as the built data will no
+    #         # longer be checked against the fields on the ``Resource``.
+    #         return bundle.obj.email
+    #     else:
+    #         return bundle.obj.email[0:2] + "..."
 
+    def get_object_list(self, request):
+        logger.debug('get_object_list')
+        results = AUserService().get_all()
+
+        # results = []
+
+        # for result in query.run():
+        #     new_obj = RiakObject(initial=result[1])
+        #     new_obj.uuid = result[0]
+        #     results.append(new_obj)
+
+        return results
+
+    def obj_get_list(self, bundle, **kwargs):
+        logger.debug('obj_get_list')
+        # Filtering disabled for brevity...
+        results = self.get_object_list(bundle.request)
+        logger.debug(results)
+        return results
 
 class CarResource(ModelResource):
     class Meta:

@@ -7,15 +7,21 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from datetime import date
 from django.core.validators import MaxValueValidator, MinValueValidator
+from phonenumber_field.modelfields import PhoneNumberField
+
+from PIL import Image
+from cStringIO import StringIO
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 class AUser(AbstractBaseUser, PermissionsMixin):
     """
     AUser - User model with a full-length email field as the username.
             Email and password are required. Other fields are optional.
     """
-    email = models.EmailField(_('user email address'), max_length=254, unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('user email address'), max_length=254, unique=True)
+
     age = models.SmallIntegerField(blank=True, null=True, default=25, verbose_name="user age",
                                     validators=[MinValueValidator(14),
                                                 MaxValueValidator(120)])
@@ -28,6 +34,9 @@ class AUser(AbstractBaseUser, PermissionsMixin):
     appreciation = models.SmallIntegerField(blank=True, null=True, default=4, verbose_name="driver's rating ",
                                     validators=[MinValueValidator(-10),
                                                 MaxValueValidator(5000)])
+    first_phone = PhoneNumberField()
+    second_phone = PhoneNumberField()
+    avatar_id = models.CharField(_('avatar'), max_length=300, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -56,21 +65,71 @@ class AUser(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email])
 
+# class Images(models.Model):
+#     title = models.CharField(max_length = 100)
+#     image = models.ImageField(upload_to ="photos/originals/%Y/%m/")
+#     image_height = models.IntegerField()
+#     image_width = models.IntegerField()
+#     thumbnail = models.ImageField(upload_to="photos/thumbs/%Y/%m/")
+#     thumbnail_height = models.IntegerField()
+#     thumbnail_width = models.IntegerField()
+#     caption = models.CharField(max_length = 250, blank =True)
+
+#     def __str__(self):
+#         return "%s"%self.title
+
+#     def __unicode__(self):
+#         return self.title
+
+#     def save(self, force_update=False, force_insert=False, thumb_size=(180,300)):
+
+#         image = Image.open(self.image)
+
+#         if image.mode not in ('L', 'RGB'):
+#             image = image.convert('RGB')
+
+#         # save the original size
+#         self.image_width, self.image_height = image.size
+
+#         image.thumbnail(thumb_size, Image.ANTIALIAS)
+
+#         # save the thumbnail to memory
+#         temp_handle = StringIO()
+#         image.save(temp_handle, 'png')
+#         temp_handle.seek(0) # rewind the file
+
+#         # save to the thumbnail field
+#         suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
+#                                  temp_handle.read(),
+#                                  content_type='image/png')
+#         self.thumbnail.save(suf.name+'.png', suf, save=False)
+#         self.thumbnail_width, self.thumbnail_height = image.size
+
+#         # save the image object
+#         super(Images, self).save(force_update, force_insert)
 
 class Car(models.Model):
     """
     Car - A model which describes user's car. seats field is required
     """
     owner = models.ForeignKey(AUser, related_name='cars')
-    manufacturer = models.CharField(max_length=255)
-    year_manufacter = models.SmallIntegerField(blank=True, null=True, default=2014, verbose_name="year of cars construction",
+    manufacturer = models.CharField(_('brand name'), max_length=255)
+    model = models.CharField(max_length=255)
+    year = models.SmallIntegerField(blank=True, null=True, default=2014, verbose_name="year of cars construction",
                                     validators=[MinValueValidator(1970),
                                                 MaxValueValidator(date.today().year + 1) ])
-    car_model = models.CharField(max_length=255)
+
     notes = models.TextField(blank=True, null=True, verbose_name="field for notes")
     seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="available seats with driver", help_text="",
                                     validators=[MinValueValidator(2),
                                                 MaxValueValidator(50)])
+class City(models.Model):
+    """
+    City -
+    """
+    name = models.CharField(_('city name'), max_length=255)
+    latitude = models.FloatField(blank=True, null=True,   verbose_name="latitude of the city")
+    longtitude = models.FloatField(blank=True, null=True,   verbose_name="longtitude of the city")
 
 
 class Race(models.Model):
@@ -79,11 +138,16 @@ class Race(models.Model):
     """
     owner = models.ForeignKey(AUser, related_name='races')
     car = models.ForeignKey(Car, related_name='races')
-    time =  models.DateTimeField()
-    available_seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="available seats with driver", help_text="",
+    date_time =  models.DateTimeField()
+    all_available_seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="available seats with driver", help_text="",
                                     validators=[MinValueValidator(2),
                                                 MaxValueValidator(50)])
-    city_from = models.CharField(_('city from'), max_length=30, blank=True)
-    city_to = models.CharField(_('destination city'), max_length=30, blank=True)
+    left_available_seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="left seats", help_text="",
+                                    validators=[MinValueValidator(2),
+                                                MaxValueValidator(50)])
+
+    city_from = models.ForeignKey(City)
+    city_to = models.ForeignKey(City)
+
     completed = models.BooleanField(_('active'), default=True)
     follower = models.ForeignKey(AUser, related_name='trips')
