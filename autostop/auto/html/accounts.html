@@ -200,9 +200,9 @@
                     $scope.loadData();
                     $('#add_model_window').modal('hide');
                 });
-                $scope.openAddUpdateWnd = function(account) {
+                $scope.openAddUpdateWnd = function(user) {
                     $('#add_model_window').modal({});
-                    dataExchangeService.post('updateAccountModel', account || {});
+                    dataExchangeService.post('updateAccountModel', user || {});
                     // accountFormValidator.resetForm();
                 };
 

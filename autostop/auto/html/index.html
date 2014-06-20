@@ -8,7 +8,7 @@
     <div class="panel panel-default" ng-controller="AccountListCtrl">
 
         <div class="panel-heading">Список всех поездок
-            <a class="btn   btn-success glyphicon glyphicon-plus navbar-right" href="#" ng-click="openAddUpdateWnd()">Добавить поездку</a>
+            <a class="btn   btn-success glyphicon glyphicon-plus navbar-right" href="#" ng-click="openUserAddUpdateWnd()">Добавить пользователя</a>
         </div>
 
         <div class="panel-body">
@@ -44,14 +44,14 @@
                         <td data-name="age">{$user.age$}</td>
                         <td data-name="appreciation">{$ user.appreciation $} </td>
 
-                        <td ng-click="openAddUpdateWnd(account)">
+                        <td ng-click="openUserAddUpdateWnd(user)">
                             <a
                                 class="glyphicon glyphicon-pencil center-block"
                                 href="#"
 
                             ></a>
                         </td>
-                        <td ng-click="deleteAccount(account)">
+                        <td ng-click="deleteUser(user)">
                             <a class="glyphicon glyphicon-remove text-danger center-block delete_btn" href="#" ></a>
                         </td>
                     </tr>
@@ -60,7 +60,11 @@
         </div>
         <div class="panel-footer">
             <div class="container-fluid ">
-                <div class="btn btn-default btn-lg pull-left">
+                <div
+                class="btn btn-default btn-lg pull-left"
+                ng-click="loadData(meta.offset - meta.limit)"
+                ng-class="meta.offset === 0 ? 'disabled' : '' "
+                >
                     <a class="glyphicon glyphicon-chevron-left   center-block " href="#" >Prev</a>
                 </div>
                 <div class="center-block " style="width:300px;">
@@ -74,8 +78,12 @@
                         </button>
                     </div>
                 </div>
-                <div class="btn btn-default btn-lg pull-right">
-                    <a class="glyphicon glyphicon-chevron-right  center-block " href="#" >Next</a>
+                <div
+                class="btn btn-default btn-lg pull-right"
+                ng-click="loadData(meta.offset + meta.limit)"
+                ng-class="(meta.offset + meta.limit) >= meta.total_count ? 'disabled' : '' "
+                >
+                    <a class="glyphicon glyphicon-chevron-right  center-block " href="#"  >Next</a>
                 </div>
             </div>
         </div>
@@ -119,6 +127,12 @@
                 <input type="checkbox" ng-model="user.is_driver" class="form-control" id="input_is_driver">
             </div>
         </div>
+        <div class="form-group">
+            <label for="input_gender" class="col-sm-2 control-label">Пол</label>
+            <div class="col-sm-10">
+                <input type="checkbox" ng-model="user.gender" class="form-control" id="input_gender">
+            </div>
+        </div>
         <div class="form-group" >
             <div class="col-sm-offset-2 col-sm-10">
               <button type="submit" ng-click="processForm()" class="btn btn-default">Добавить</button>
@@ -128,20 +142,177 @@
     </form>
 </div>
 
+<!-- Modal -->
+    <div
+        class="modal fade bs-modal-lg "
+        id="add_model_window"
+        ng-controller="AccountCtrl"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal_width">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="add_model_windowLabel">Добавить Пользователя</h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Информация о Пользователе</div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="input_email" class="col-sm-2 control-label">E-mail</label>
+                                            <div class="col-sm-10">
+                                                <input type="email" ng-model="user.email" class="form-control" placeholder="Ваш E-mail">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_password" class="col-sm-2 control-label">Password</label>
+                                            <div class="col-sm-10">
+                                              <input type="password" class="form-control" ng-model="user.password" id="input_password" placeholder="Password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_first_name" class="col-sm-2 control-label">Имя</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" ng-model="user.first_name" class="form-control" id="input_first_name" placeholder="Ваше Имя">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_last_name" class="col-sm-2 control-label">Фамилия</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" ng-model="user.last_name" class="form-control" id="input_last_name" placeholder="Ваша Фамилия">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_age" class="col-sm-2 control-label">Возраст</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" ng-model="user.age" class="form-control" id="input_age" placeholder="Ваш Возраст" value="24">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_is_driver" class="col-sm-2 control-label">Водитель</label>
+                                            <div class="col-sm-10">
+                                                <input type="checkbox" ng-model="user.is_driver" class="form-control" id="input_is_driver">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_gender" class="col-sm-2 control-label">Пол</label>
+                                            <div class="col-sm-10">
+                                                <input type="checkbox" ng-model="user.gender" class="form-control" id="input_gender">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" >
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                              <button type="submit" ng-click="processForm()" class="btn btn-default">Добавить</button>
+                                            </div>
+                                        </div>
+                                         <pre>form = {$user | json$}</pre>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button
+                    id="reset_button"
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal">
+                    Отменить
+                </button>
+                <button type="button"
+                    class="btn btn-primary"
+                    ng-click="processForm()"
+                >
+                    Сохранить
+                </button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+<!-- /.Modal -->
 
 {% endblock %}
 
 {% block scripts %}
     <script type="text/javascript">
         'use strict';
+        AutoApp.controller('AccountCtrl',
+            function($scope, $http, dataExchangeService, messageService) {
+
+                $scope.$on('updateAccountModel', function(_event, user) {
+                    user = angular.isObject(user) ? user : {};
+                    $scope.user = user;
+
+                    angular
+                        .element('div.has-error')
+                        .removeClass('has-error');
+
+                });
+                 $("#reset_button").click(function() {
+                    $('#add_model_window').modal('hide');
+                 });
+                $scope.processForm = function() {
+
+                    console.log($scope.user)
+                    if ($scope.accountForm.$valid && $scope.serviceForm.$valid) {
+
+                        var errorMsgOnDelete = "Во время выполнения запроса произошла ошибка. Запись не сохранена";
+
+                        var onFailSaving = function() {
+                            messageService.error(errorMsgOnDelete);
+                            dataExchangeService.post('loadData');
+                        };
+                        var saveServices = function(account) {
+                            dataExchangeService.post('loadData');
+                        };
+
+                        $http.put("/api/v1/user/",
+                            $scope.account_model
+
+                        ).success(function(response) {
+                            if (response && (response.success || response.id)) {
+                                saveServices(response);
+                            } else {
+                                onFailSaving();
+                            }
+
+                        })
+                            .error(onFailSaving);
+
+                    } else {
+
+                        console.log($scope.serviceForm.$error)
+
+                        angular
+                            .element(':input.ng-invalid')
+                            .first()
+                            .focus()
+                            .closest('.form-group')
+                            .addClass('has-error');
+                    }
+                }
+
+            }
+        ).$inject = ['$scope', '$http', 'dataExchangeService', 'messageService'];
+
 
         AutoApp.controller('AccountListCtrl',
             function($scope, $http, dataExchangeService, messageService) {
 
-                $scope.loadData = function() {
+                $scope.loadData = function(offset) {
                     $http.get('/api/v1/user/', {
                         params: {
-                            offset: 0
+                            offset: offset && offset > 0 ? offset : 0
                         }
 
                     }).success(function(data) {
@@ -149,43 +320,38 @@
                         $scope.meta = data.meta;
                     });
                 };
-                // $scope.$on('loadData', function(){
-                //     $scope.loadData();
-                //     $('#add_model_window').modal('hide');
-                // });
-                // $scope.openAddUpdateWnd = function(account) {
-                //     $('#add_model_window').modal({});
-                //     dataExchangeService.post('updateAccountModel', account || {});
-                //     // accountFormValidator.resetForm();
-                // };
+                $scope.deleteUser = function(user) {
+                    bootbox.confirm(
+                        "Вы хотите удалить  '{0}' {1}".format(user.first_name, user.last_name),
+                            function(wantToDelete) {
+                                if (wantToDelete) {
+                                    var errorMsgOnDelete = "Во время Удаления произошла ошибка. Запись возможно не удалена";
+                                    $http.delete( user.resource_uri).success(function(response) {
+                                        if (response && response.success) {
+                                            messageService.show("Запись успешно удалена");
+                                        } else {
+                                            messageService.error(errorMsgOnDelete);
+                                        }
+                                        $scope.loadData();
+                                    }).error(function() {
+                                        $scope.loadData();
+                                        messageService.error(errorMsgOnDelete);
+                                    })
 
-                // $scope.orderProp = 'uid';
-                // $scope.deleteAccount = function(account) {
-                //     bootbox.confirm(
-                //         "Вы хотите удалить жильца '{0}' из квартиры № {1}".format(account.name, account.uid),
-                //             function(wantToDelete) {
-                //                 if (wantToDelete) {
-                //                     var errorMsgOnDelete = "Во время Удаления произошла ошибка. Запись возможно не удалена";
-                //                     $http.delete("/rest/accounts/", {
-                //                         params: {
-                //                             uid: account.uid
-                //                         }
-                //                     }).success(function(response) {
-                //                         if (response && response.success) {
-                //                             messageService.show("Запись успешно удалена");
-                //                         } else {
-                //                             messageService.error(errorMsgOnDelete);
-                //                         }
-                //                         $scope.loadData();
-                //                     }).error(function() {
-                //                         $scope.loadData();
-                //                         messageService.error(errorMsgOnDelete);
-                //                     })
+                                }
+                            }
+                    );
+                }
+                $scope.$on('loadData', function(){
+                    $scope.loadData();
+                    $('#add_model_window').modal('hide');
+                });
+                $scope.openUserAddUpdateWnd = function(user) {
+                    $('#add_model_window').modal({});
+                    dataExchangeService.post('updateAccountModel', user || {});
+                    // accountFormValidator.resetForm();
+                };
 
-                //                 }
-                //             }
-                //     );
-                // }
 
                 $scope.loadData();
             }
@@ -205,6 +371,7 @@
                             dataExchangeService.post('loadData');
                         };
                         var saveServices = function(user) {
+                            console.log('saveServices')
                             // $scope.service_model.account = account.id;
                             // $http.post("/rest/services/",
                             //     $scope.service_model
@@ -212,7 +379,7 @@
                             // ).success(function(response) {
                             //     if (response && (response.success || response.id)) {
                             //         messageService.show("Запись успешно сохранена");
-                            //         dataExchangeService.post('loadData');
+                                    dataExchangeService.post('loadData');
                             //     } else {
                             //         onFailSaving();
                             //     }

@@ -10,6 +10,7 @@ from autostop.auto.models import AUser
 from autostop.auto.models import Car
 from autostop.auto.models import Race
 
+from autostop.settings import API_LIMIT_PER_PAGE
 from autostop.auto.services.UserServices import AUserService
 
 import logging,  json
@@ -24,6 +25,7 @@ class AUserResource(ModelResource):
             'last_name': ALL,
         }
         authorization = Authorization()
+
 
     # def dehydrate_password(self, bundle):
     #     return ''
@@ -57,15 +59,32 @@ class AUserResource(ModelResource):
         logger.debug(results)
         return results
 
-class CarResource(ModelResource):
-    class Meta:
-        queryset = Car.objects.all()
-        resource_name = 'car'
+    def dehydrate_password(self, bundle):
+        return ''
 
-class RaceResource(ModelResource):
-    class Meta:
-        queryset = Race.objects.all()
-        resource_name = 'race'
+    def dehydrate_email(self, bundle):
+        if bundle.request.user.pk == bundle.obj.pk:
+            return bundle.obj.email
+        else:
+            return bundle.obj.email[0:2] + "..."
+
+    def get_object_list(self, request):
+        results = AUserService().get_active_all()
+        return results
+
+    def obj_get_list(self, bundle, **kwargs):
+        return self.get_object_list(bundle.request)
+
+
+# class CarResource(ModelResource):
+#     class Meta:
+#         queryset = Car.objects.all()
+#         resource_name = 'car'
+
+# class RaceResource(ModelResource):
+#     class Meta:
+#         queryset = Race.objects.all()
+#         resource_name = 'race'
 # class EntryResource(ModelResource):
 #     user = fields.ForeignKey(UserResource, 'user')
 
