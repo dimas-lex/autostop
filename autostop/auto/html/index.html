@@ -7,7 +7,7 @@
 {% block content %}
     <div class="panel panel-default" ng-controller="AccountListCtrl">
 
-        <div class="panel-heading">Список всех поездок
+        <div class="panel-heading">Список всех пользователей
             <a class="btn   btn-success glyphicon glyphicon-plus navbar-right" href="#" ng-click="openUserAddUpdateWnd()">Добавить пользователя</a>
         </div>
 
@@ -244,182 +244,12 @@
 {% endblock %}
 
 {% block scripts %}
+
+    <script type="text/javascript" src="/static/js/controller/AddUserCtrl.js"></script>
+    <script type="text/javascript" src="/static/js/controller/AccountCtrl.js"></script>
+    <script type="text/javascript" src="/static/js/controller/AccountListCtrl.js"></script>
+
     <script type="text/javascript">
         'use strict';
-        AutoApp.controller('AccountCtrl',
-            function($scope, $http, dataExchangeService, messageService) {
-
-                $scope.$on('updateAccountModel', function(_event, user) {
-                    user = angular.isObject(user) ? user : {};
-                    $scope.user = user;
-
-                    angular
-                        .element('div.has-error')
-                        .removeClass('has-error');
-
-                });
-                 $("#reset_button").click(function() {
-                    $('#add_model_window').modal('hide');
-                 });
-                $scope.processForm = function() {
-
-                    console.log($scope.user)
-                    if ($scope.accountForm.$valid && $scope.serviceForm.$valid) {
-
-                        var errorMsgOnDelete = "Во время выполнения запроса произошла ошибка. Запись не сохранена";
-
-                        var onFailSaving = function() {
-                            messageService.error(errorMsgOnDelete);
-                            dataExchangeService.post('loadData');
-                        };
-                        var saveServices = function(account) {
-                            dataExchangeService.post('loadData');
-                        };
-
-                        $http.put("/api/v1/user/",
-                            $scope.account_model
-
-                        ).success(function(response) {
-                            if (response && (response.success || response.id)) {
-                                saveServices(response);
-                            } else {
-                                onFailSaving();
-                            }
-
-                        })
-                            .error(onFailSaving);
-
-                    } else {
-
-                        console.log($scope.serviceForm.$error)
-
-                        angular
-                            .element(':input.ng-invalid')
-                            .first()
-                            .focus()
-                            .closest('.form-group')
-                            .addClass('has-error');
-                    }
-                }
-
-            }
-        ).$inject = ['$scope', '$http', 'dataExchangeService', 'messageService'];
-
-
-        AutoApp.controller('AccountListCtrl',
-            function($scope, $http, dataExchangeService, messageService) {
-
-                $scope.loadData = function(offset) {
-                    $http.get('/api/v1/user/', {
-                        params: {
-                            offset: offset && offset > 0 ? offset : 0
-                        }
-
-                    }).success(function(data) {
-                        $scope.users = data.objects;
-                        $scope.meta = data.meta;
-                    });
-                };
-                $scope.deleteUser = function(user) {
-                    bootbox.confirm(
-                        "Вы хотите удалить  '{0}' {1}".format(user.first_name, user.last_name),
-                            function(wantToDelete) {
-                                if (wantToDelete) {
-                                    var errorMsgOnDelete = "Во время Удаления произошла ошибка. Запись возможно не удалена";
-                                    $http.delete( user.resource_uri).success(function(response) {
-                                        if (response && response.success) {
-                                            messageService.show("Запись успешно удалена");
-                                        } else {
-                                            messageService.error(errorMsgOnDelete);
-                                        }
-                                        $scope.loadData();
-                                    }).error(function() {
-                                        $scope.loadData();
-                                        messageService.error(errorMsgOnDelete);
-                                    })
-
-                                }
-                            }
-                    );
-                }
-                $scope.$on('loadData', function(){
-                    $scope.loadData();
-                    $('#add_model_window').modal('hide');
-                });
-                $scope.openUserAddUpdateWnd = function(user) {
-                    $('#add_model_window').modal({});
-                    dataExchangeService.post('updateAccountModel', user || {});
-                    // accountFormValidator.resetForm();
-                };
-
-
-                $scope.loadData();
-            }
-        ).$inject = ['$scope', '$http', 'dataExchangeService', 'messageService'];
-
-        AutoApp.controller('AddUserCtrl',
-            function($scope, $http, dataExchangeService, messageService) {
-                $scope.user = {};
-                $scope.processForm = function() {
-                    var user = $scope.user;
-                    if (user && user.password && user.email) {
-                        // $scope.account_model = account;
-                        var errorMsgOnDelete = "Во время выполнения запроса произошла ошибка. Запись не сохранена";
-
-                        var onFailSaving = function() {
-                            messageService.error(errorMsgOnDelete);
-                            dataExchangeService.post('loadData');
-                        };
-                        var saveServices = function(user) {
-                            console.log('saveServices')
-                            // $scope.service_model.account = account.id;
-                            // $http.post("/rest/services/",
-                            //     $scope.service_model
-
-                            // ).success(function(response) {
-                            //     if (response && (response.success || response.id)) {
-                            //         messageService.show("Запись успешно сохранена");
-                                    dataExchangeService.post('loadData');
-                            //     } else {
-                            //         onFailSaving();
-                            //     }
-
-                            // })
-                            // .error(onFailSaving);
-                        }
-
-                        $http.post("/api/v1/user/",
-                            user
-                        ).success(function(response) {
-                            if (response && (response.success || response.id)) {
-                                saveServices(response);
-                            } else {
-                                onFailSaving();
-                            }
-
-                        })
-                        .error(onFailSaving);
-
-                    } else {
-
-                        // console.log($scope.serviceForm.$error)
-
-                        // angular
-                        //     .element(':input.ng-invalid')
-                        //     .first()
-                        //     .focus()
-                        //     .closest('.form-group')
-                        //     .addClass('has-error');
-                    }
-
-                };
-
-                $scope.reset = function() {
-                    $scope.user = angular.copy($scope.master);
-                };
-                $scope.reset();
-            }
-        ).$inject = ['$scope', '$http', 'dataExchangeService', 'messageService'];
-
     </script>
 {% endblock%}

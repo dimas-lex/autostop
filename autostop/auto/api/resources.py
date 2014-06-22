@@ -1,4 +1,4 @@
-# from django.contrib.auth.models import User
+# -*- coding: utf-8 -*-
 from autostop.auto.models import AUser, Car, Race
 from tastypie.cache import SimpleCache
 from tastypie import fields
@@ -73,15 +73,18 @@ class AUserResource(ModelResource):
         return self.get_object_list(bundle.request)
 
 
-# class CarResource(ModelResource):
-#     class Meta:
-#         queryset = Car.objects.all()
-#         resource_name = 'car'
+class CarResource(ModelResource):
+    class Meta:
+        queryset = Car.objects.all()
+        resource_name = 'car'
 
-# class RaceResource(ModelResource):
-#     class Meta:
-#         queryset = Race.objects.all()
-#         resource_name = 'race'
+
+class RaceResource(ModelResource):
+    class Meta:
+        queryset = Race.objects.all()
+        resource_name = 'race'
+
+
 # class EntryResource(ModelResource):
 #     user = fields.ForeignKey(UserResource, 'user')
 

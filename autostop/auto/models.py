@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
 from django.utils.http import urlquote
@@ -13,58 +13,6 @@ from PIL import Image
 from cStringIO import StringIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-class AUser(AbstractBaseUser, PermissionsMixin):
-    """
-    AUser - User model with a full-length email field as the username.
-            Email and password are required. Other fields are optional.
-    """
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    email = models.EmailField(_('user email address'), max_length=254, unique=True)
-
-    age = models.SmallIntegerField(blank=True, null=True, default=25, verbose_name="user age",
-                                    validators=[MinValueValidator(14),
-                                                MaxValueValidator(120)])
-    gender = models.NullBooleanField(blank=True, null=True, default=True) # true - man, false - woman
-    is_staff = models.BooleanField(_('staff status'), default=False)
-    is_active = models.BooleanField(_('active'), default=False)
-    is_driver = models.BooleanField(_('active'), default=True)
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-
-    appreciation = models.SmallIntegerField(blank=True, null=True, default=4, verbose_name="driver's rating ",
-                                    validators=[MinValueValidator(-10),
-                                                MaxValueValidator(5000)])
-    first_phone = PhoneNumberField()
-    second_phone = PhoneNumberField()
-    avatar_id = models.CharField(_('avatar'), max_length=300, blank=True)
-
-    objects = UserManager()
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-
-    def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.email)
-
-    def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
-        full_name = '%s %s' % (self.first_name, self.last_name)
-        return full_name.strip()
-
-    def get_short_name(self):
-        "Returns the short name for the user."
-        return self.first_name
-
-    def email_user(self, subject, message, from_email=None):
-        """
-        Sends an email to this User.
-        """
-        send_mail(subject, message, from_email, [self.email])
 
 class Images(models.Model):
     title = models.CharField(max_length = 100)
@@ -109,13 +57,72 @@ class Images(models.Model):
         # save the image object
         super(Images, self).save(force_update, force_insert)
 
+
+class AUser(AbstractBaseUser, PermissionsMixin):
+    """
+    AUser - User model with a full-length email field as the username.
+            Email and password are required. Other fields are optional.
+    """
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('user email address'), max_length=254, unique=True)
+
+    age = models.SmallIntegerField(blank=True, null=True, default=25, verbose_name="user age",
+                                    validators=[MinValueValidator(14),
+                                                MaxValueValidator(120)])
+    gender = models.NullBooleanField(blank=True, null=True, default=True) # true - man, false - woman
+    is_staff = models.BooleanField(_('staff status'), default=False)
+    is_active = models.BooleanField(_('active'), default=False)
+    is_driver = models.BooleanField(_('active'), default=True)
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    appreciation = models.SmallIntegerField(blank=True, null=True, default=4, verbose_name="driver's rating ",
+                                    validators=[MinValueValidator(-10),
+                                                MaxValueValidator(5000)])
+    first_phone = PhoneNumberField(blank=True, null=True)
+    second_phone = PhoneNumberField(blank=True, null=True)
+    avatar_id = models.CharField(_('avatar'), max_length=300, blank=True,null=True)
+
+    objects = UserManager()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+
+    def get_absolute_url(self):
+        return "/users/%s/" % urlquote(self.email)
+
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        """
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        "Returns the short name for the user."
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None):
+        """
+        Sends an email to this User.
+        """
+        send_mail(subject, message, from_email, [self.email])
+
+
+class Avatar(Images):
+    auser = models.ForeignKey(AUser, related_name='avatars')
+
+
 class Car(models.Model):
     """
     Car - A model which describes user's car. seats field is required
     """
     owner = models.ForeignKey(AUser, related_name='cars')
     manufacturer = models.CharField(_('brand name'), max_length=255)
-    model = models.CharField(max_length=255)
+    model = models.CharField(max_length=255, null=True, blank=True)
     year = models.SmallIntegerField(blank=True, null=True, default=2014, verbose_name="year of cars construction",
                                     validators=[MinValueValidator(1970),
                                                 MaxValueValidator(date.today().year + 1) ])
@@ -124,6 +131,10 @@ class Car(models.Model):
     seats = models.SmallIntegerField(blank=False, null=False, default=4, verbose_name="available seats with driver", help_text="",
                                     validators=[MinValueValidator(2),
                                                 MaxValueValidator(50)])
+
+
+class CarImages(Images):
+    car = models.ForeignKey(AUser, related_name='images')
 
 
 class City(models.Model):

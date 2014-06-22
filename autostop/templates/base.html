@@ -18,6 +18,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js" type="text/javascript"></script>
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
+
     </head>
     <body >
         <!-- ng-controller="AutoBaseCtrl" -->
@@ -45,10 +46,16 @@
                     data-titles="{&quot;warning&quot;: &quot;&lt;em&gt;Warning!&lt;/em&gt;&quot;}"
                     data-ids="myid"
                     data-fade="10000">
+                <div class="row">
+                    <div ng-controller="AlertDemoCtrl">
+                        <alert ng-repeat="alert in alerts" type="{$alert.type$}" close="closeAlert($index)">{$alert.msg$}</alert>
+                    </div>
+                </div>
             </div>
 
                 {% if messages %}
                 {% endif %}
+
                 {% block content %} Empty page {% endblock %}
 
             <p><hr/></p>
@@ -62,9 +69,10 @@
 
         <script type="text/javascript" src="/static/js/app.js"></script>
         <script type="text/javascript" src="/static/js/bootbox.min.js"></script>
+        <script type="text/javascript" src="/static/js/ui-bootstrap-tpls-0.11.0.js"></script>
         <script type="text/javascript">
             // Add the CSRF Token
-            var AutoApp = angular.module('AutoApp', []);
+            var AutoApp = angular.module('AutoApp', ['ui.bootstrap']);
 
             AutoApp.config(function($interpolateProvider) {
                 $interpolateProvider.startSymbol('{$');
@@ -118,62 +126,11 @@
                     // ]; test
                 }
             ]);
-            AutoApp.factory('dataExchangeService', function($rootScope) {
-                var dataExchangeService = {};
-                dataExchangeService.post = function(_event, account) {
-                    $rootScope.$broadcast(_event || 'loadAccount', account || {});
-                };
 
-                return dataExchangeService;
-            });
 
-            AutoApp.factory('messageService', function($rootScope) {
-                var messageService = {
-                    show: function(params) {
-                         if (!angular.isObject(params)) {
-                            params = {
-                                msg: params || 'Ошибка',
-                                type: 'success'
-                            }
-                        }
-                        $(document).trigger("add-alerts", [{
-                            priority: params.type,
-                            message: params.msg
-                        }]);
-                    },
-                    error: function(msg) {
-                        messageService.show({
-                            msg: msg,
-                            type: 'error'
-                        });
-                    }
-                };
-                return messageService;
-            });
-
-            // AutoApp.controller('AutoBaseCtrl', ['$scope',
-            // //     function($scope) {
-            // //         $("input[name*='date']").datepicker({
-            // //             'data-format': "dd.mm.yyyy",
-            // //             pickTime: false,
-            // //             language: "ru-RU",
-            // //             format: "dd.mm.yyyy",
-            // //             autoclose: true,
-            // //             clearBtn: true,
-            // //             orientation: "top right",
-            // //             weekStart: 1
-            // //         });
-            // //     }
-            // ]);
-            AutoApp.filter('range', function() {
-                return function(input, total) {
-                    total = parseInt(total);
-                    for (var i = 0; i < total; i++)
-                        input.push(i);
-                    return input;
-                };
-            });
         </script>
+        <script type="text/javascript" src="/static/js/appServices.js"></script>
+        <script type="text/javascript" src="/static/js/controllers.js"></script>
         {% block scripts %}
 
         {% endblock %}
