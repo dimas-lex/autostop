@@ -47,7 +47,7 @@
                     data-ids="myid"
                     data-fade="10000">
                 <div class="row">
-                    <div ng-controller="AlertDemoCtrl">
+                    <div ng-controller="AlertDemoCtrl" id="alert_container">
                         <alert ng-repeat="alert in alerts" type="{$alert.type$}" close="closeAlert($index)">{$alert.msg$}</alert>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
 
         </script>
         <script type="text/javascript" src="/static/js/appServices.js"></script>
-        <script type="text/javascript" src="/static/js/controllers.js"></script>
+        <script type="text/javascript" src="/static/js/controller/GeneralCtrl.js"></script>
         {% block scripts %}
 
         {% endblock %}

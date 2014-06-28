@@ -1,7 +1,14 @@
 AutoApp.controller('AlertDemoCtrl', function($scope, $timeout, dataExchangeService) {
 
-    $scope.$on('show', function(_event, agrs) {
-        $scope.alerts.push(agrs);
+    $scope.$on('show', function(_event, args) {
+        args._uid = Utils.createUUID();
+        $scope.alerts.push(args);
+
+        $timeout(function() {
+            var chld  = $('#alert_container:first-child');
+            chld.fadeOut(500);
+        }, Math.max(String(args.msg).length,  5000));
+
     });
 
     $scope.alerts = [];

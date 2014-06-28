@@ -69,7 +69,6 @@ var App = (function() {
         );
     };
 
-
     return {
         Utils: {
             getDataFromRow: function(cell) {
@@ -93,4 +92,17 @@ var App = (function() {
         }
     };
 
+})();
+var Utils = (function() {
+    return {
+        createUUID: function() {
+            // http://www.ietf.org/rfc/rfc4122.txt
+            //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(chr) {
+                var rnd = Math.random() * 16 | 0,
+                    val = chr === 'x' ? rnd : (rnd & 0x3 | 0x8);
+                return val.toString(16);
+            }).toUpperCase();
+        }
+    };
 })();

@@ -2,12 +2,18 @@
 
 AutoApp.controller('AddUserCtrl',
     function($scope, $http, dataExchangeService, messageService) {
-        $scope.master = {
-            email: "email" + Number(Math.random() * 1000).toFixed(3) + "@ya.ru",
-            password: "password" + Number(Math.random() * 1000).toFixed(3),
-            age: 25
+        $scope._getMockData = function() {
+            return {
+                email: "email" + Number(Math.random() * 1000).toFixed(0) + "@ya.ru",
+                password: "password" + Number(Math.random() * 1000).toFixed(0),
+                first_name: "first_name" + Number(Math.random() * 1000).toFixed(0),
+                last_name: "last_name" + Number(Math.random() * 1000).toFixed(0),
+                age: Number(Math.random() * 100).toFixed(0),
+                is_driver: (Number(Math.random() * 10).toFixed(0) % 2) === 0
+            };
         };
-        console.info($scope.user)
+
+
         $scope.processForm = function() {
             var user = $scope.user;
             if (user && user.password && user.email) {
@@ -39,6 +45,8 @@ AutoApp.controller('AddUserCtrl',
                 $http.post("/api/v1/user/",
                     user
                 ).success(function(response) {
+                    console.log(response);
+
                     if (response && (response.success || response.id)) {
                         saveServices(response);
                     } else {
@@ -63,7 +71,8 @@ AutoApp.controller('AddUserCtrl',
         };
 
         $scope.reset = function() {
-            $scope.user = angular.copy($scope.master);
+            // $scope.user = angular.copy($scope.master);
+            $scope.user = $scope._getMockData();
         };
         $scope.reset();
     }
