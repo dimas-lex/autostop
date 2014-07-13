@@ -1,0 +1,235 @@
+    <div class="panel panel-default" ng-controller="HomeController">
+
+        <div class="panel-heading">Список всех пользователей
+            <a class="btn   btn-success glyphicon glyphicon-plus navbar-right" href="#" ng-click="openUserAddUpdateWnd()">Добавить пользователя</a>
+        </div>
+
+        <div class="panel-body">
+            <table class="table table-striped table-bordered table-hover" >
+                <thead>
+                  <tr>
+                      <th class="hidden"></th>
+                      <th ></th>
+                      <th ></th>
+                      <th width="30%">Имя</th>
+                      <th width="30%">Фамилия</th>
+                      <th width="50px">Возраст</th>
+                      <th width="40px">Рейтинг</th>
+
+                      <th width="50px">Редактировать</th>
+                      <th width="50px">Удалить</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in users | orderBy:orderProp">
+                        <td data-name="id" class="hidden">{$user.id$}</td>
+                        <td data-name="gender" >
+                            <img src="/static/images/man.png" ng-if="user.gender" />
+                            <img src="/static/images/woman.png" ng-if="!user.gender" />
+                         </td>
+                        <td data-name="id" >
+                            <img src="/static/images/car.png" ng-if="user.is_driver" />
+                            <img src="/static/images/pedestrian.png" ng-if="!user.is_driver" />
+                         </td>
+                        <td data-name="first_name">{$user.first_name$}</td>
+                        <td data-name="last_name">{$user.last_name$}</td>
+
+                        <td data-name="age">{$user.age$}</td>
+                        <td data-name="appreciation">{$ user.appreciation $} </td>
+
+                        <td ng-click="openUserAddUpdateWnd(user)">
+                            <a
+                                class="glyphicon glyphicon-pencil center-block"
+                                href="#"
+
+                            ></a>
+                        </td>
+                        <td ng-click="deleteUser(user)">
+                            <a class="glyphicon glyphicon-remove text-danger center-block delete_btn" href="#" ></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            <div class="container-fluid ">
+                <div
+                class="btn btn-default btn-lg pull-left"
+                ng-click="loadData(meta.offset - meta.limit)"
+                ng-class="meta.offset === 0 ? 'disabled' : '' "
+                >
+                    <a class="glyphicon glyphicon-chevron-left   center-block " href="#" >Prev</a>
+                </div>
+                <div class="center-block " style="width:300px;">
+                    <div class="center-block">
+                        <button
+                          type="button"
+                          ng-click="loadData()"
+                          class="btn btn-default btn-lg navbar-left">
+                            <!--  -->
+                            <a class="glyphicon glyphicon-refresh center-block " href="#" >Обновить таблицу</a>
+                        </button>
+                    </div>
+                </div>
+                <div
+                class="btn btn-default btn-lg pull-right"
+                ng-click="loadData(meta.offset + meta.limit)"
+                ng-class="(meta.offset + meta.limit) >= meta.total_count ? 'disabled' : '' "
+                >
+                    <a class="glyphicon glyphicon-chevron-right  center-block " href="#"  >Next</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div ng-controller="AddUserCtrl">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="input_email" class="col-sm-2 control-label">E-mail</label>
+            <div class="col-sm-10">
+                <input type="email" ng-model="user.email" class="form-control" placeholder="Ваш E-mail">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input_password" class="col-sm-2 control-label">Password</label>
+            <div class="col-sm-10">
+              <input type="password" class="form-control" ng-model="user.password" id="input_password" placeholder="Password">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input_first_name" class="col-sm-2 control-label">Имя</label>
+            <div class="col-sm-10">
+                <input type="text" ng-model="user.first_name" class="form-control" id="input_first_name" placeholder="Ваше Имя">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input_last_name" class="col-sm-2 control-label">Фамилия</label>
+            <div class="col-sm-10">
+                <input type="text" ng-model="user.last_name" class="form-control" id="input_last_name" placeholder="Ваша Фамилия">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input_age" class="col-sm-2 control-label">Возраст</label>
+            <div class="col-sm-10">
+                <input type="text" ng-model="user.age" class="form-control" id="input_age" placeholder="Ваш Возраст" value="24">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input_is_driver" class="col-sm-2 control-label">Водитель</label>
+            <div class="col-sm-10">
+                <input type="checkbox" ng-model="user.is_driver" class="form-control" id="input_is_driver">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input_gender" class="col-sm-2 control-label">Пол</label>
+            <div class="col-sm-10">
+                <input type="checkbox" ng-model="user.gender" class="form-control" id="input_gender">
+            </div>
+        </div>
+        <div class="form-group" >
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" ng-click="processForm()" class="btn btn-default">Добавить</button>
+            </div>
+        </div>
+         <pre>form = {$user | json$}</pre>
+    </form>
+</div>
+
+<!-- Modal -->
+    <div
+        class="modal fade bs-modal-lg "
+        id="add_model_window"
+        ng-controller="AccountCtrl"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal_width">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="add_model_windowLabel">Добавить Пользователя</h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Информация о Пользователе</div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="input_email" class="col-sm-2 control-label">E-mail</label>
+                                            <div class="col-sm-10">
+                                                <input type="email" ng-model="user.email" class="form-control" placeholder="Ваш E-mail">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_password" class="col-sm-2 control-label">Password</label>
+                                            <div class="col-sm-10">
+                                              <input type="password" class="form-control" ng-model="user.password" id="input_password" placeholder="Password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_first_name" class="col-sm-2 control-label">Имя</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" ng-model="user.first_name" class="form-control" id="input_first_name" placeholder="Ваше Имя">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_last_name" class="col-sm-2 control-label">Фамилия</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" ng-model="user.last_name" class="form-control" id="input_last_name" placeholder="Ваша Фамилия">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_age" class="col-sm-2 control-label">Возраст</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" ng-model="user.age" class="form-control" id="input_age" placeholder="Ваш Возраст" value="24">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_is_driver" class="col-sm-2 control-label">Водитель</label>
+                                            <div class="col-sm-10">
+                                                <input type="checkbox" ng-model="user.is_driver" class="form-control" id="input_is_driver">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="input_gender" class="col-sm-2 control-label">Пол</label>
+                                            <div class="col-sm-10">
+                                                <input type="checkbox" ng-model="user.gender" class="form-control" id="input_gender">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" >
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                              <button type="submit" ng-click="processForm()" class="btn btn-default">Добавить</button>
+                                            </div>
+                                        </div>
+                                         <pre>form = {$user | json$}</pre>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button
+                    id="reset_button"
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal">
+                    Отменить
+                </button>
+                <button type="button"
+                    class="btn btn-primary"
+                    ng-click="processForm()"
+                >
+                    Сохранить
+                </button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+<!-- /.Modal -->
