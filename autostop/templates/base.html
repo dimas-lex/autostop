@@ -19,6 +19,7 @@
         <script type="text/javascript" src="/static/js/lib/angular/angular.js"></script>
         <script type="text/javascript" src="/static/js/lib/angular/angular-animate.min.js"></script>
         <script type="text/javascript" src="/static/js/lib/angular/angular-route.min.js"></script>
+        <script type="text/javascript" src="/static/js/lib/angular/angular-touch.min.js"></script>
 
 
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
@@ -62,8 +63,7 @@
 
                 {% if messages %}
                 {% endif %}
-                <div ng-view></div>
-                 {% block content %}  Empty page {% endblock %}
+                <div ng-view>  </div>
 
             <p><hr/></p>
             <footer class="row">
@@ -76,19 +76,19 @@
 
         <script type="text/javascript">
             // Add the CSRF Token
-            var AutoApp = angular.module('AutoApp', ['ui.bootstrap', 'ngRoute']);
+            var AutoApp = angular.module('AutoApp', ['ui.bootstrap', 'ngRoute' , 'ngAnimate']);
             AutoApp._csrf_token = '{{ csrf_token|escapejs }}';
 
         </script>
 
-        <script type="text/javascript" src="/static/js/app.js"></script>
-        <script type="text/javascript" src="/static/js/utils/Utils.js"></script>
-        <script type="text/javascript" src="/static/js/appServices.js"></script>
+        <script type="text/javascript" src="/static/js/app/app.js"></script>
+        <script type="text/javascript" src="/static/js/app/utils/Utils.js"></script>
+        <script type="text/javascript" src="/static/js/app/appServices.js"></script>
 
-        <script type="text/javascript" src="/static/js/controller/HomeController.js"></script>
-        <script type="text/javascript" src="/static/js/controller/GeneralCtrl.js"></script>
+        <script type="text/javascript" src="/static/js/app/controller/HomeController.js"></script>
+        <script type="text/javascript" src="/static/js/app/controller/GeneralCtrl.js"></script>
 
-        <script type="text/javascript" src="/static/js/model/AUser.js"></script>
+        <script type="text/javascript" src="/static/js/app/model/AUser.js"></script>
         {% block scripts %}
 
         {% endblock %}
