@@ -1,17 +1,40 @@
 <div class="panel panel-default" ng-controller="HomeController">
     <div class="panel-body">
-          <div style="height: 305px">
-              <carousel interval="myInterval">
-                <slide ng-repeat="slide in slides" active="slide.active">
-                  <img ng-src="{$slide.image$}" style="margin:auto;">
-                  <div class="carousel-caption">
-                    <h4>Slide {$$index$}</h4>
-                    <p>{$slide.text$}</p>
-                  </div>
-                </slide>
-              </carousel>
+        <div class="row">
+            <div class="col-md-8">
+                <div style="height: 250px">
+                    <carousel interval="myInterval">
+                      <slide ng-repeat="slide in slides" active="slide.active">
+                        <img ng-src="{$slide.image$}" style="margin:auto;">
+                        <div class="carousel-caption">
+                          <h4>Slide {$$index$}</h4>
+                          <p>{$slide.text$}</p>
+                        </div>
+                      </slide>
+                    </carousel>
+                </div>
             </div>
+            <div class="col-md-4">.col-md-4</div>
+        </div>
+    </div>
+    <div class="row">
 
+        <div class="col-md-6">
+            <div ng-controller="TabsUserCtrl">
+                <tabset>
+                    <tab heading="Подвезу">
+                        <div data-driver-list-preview></div>
+                    </tab>
+                    <tab heading="Подвези">
+                    </tab>
+                    <tab ng-repeat="tab in tabs" heading="{$tab.title$}" active="tab.active" disabled="tab.disabled">
+                        {$tab.content$}
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+        <div class="col-md-6">
+        </div>
     </div>
     <div class="panel-footer">
 

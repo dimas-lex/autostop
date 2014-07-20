@@ -20,27 +20,25 @@ AutoApp.controller('HomeController', function($scope) {
 
     $scope.myInterval = 5000;
     var slides = $scope.slides;
-    $scope.addSlide = function() {
+    $scope.addSlide = function(url, text) {
 
-        var newWidth = 600 + slides.length;
         slides.push({
-            image: 'http://placekitten.com/' + newWidth + '/300',
-            text: ['More', 'Extra', 'Lots of', 'Surplus'][slides.length % 4] + ' ' +
-                ['Cats', 'Kittys', 'Felines', 'Cutes'][slides.length % 4]
+            image: url,
+            text: text
         });
-
-        console.log(slides)
     };
-    for (var i = 0; i < 4; i++) {
-        $scope.addSlide();
-    }
+
 
 });
-// AutoApp.controller('SliderController', function($scope) {
-//     $scope.initPic = 0;
+AutoApp.controller('TabsUserCtrl', function($scope) {
+    $scope.customer = {
+        name: 'bla',
+        address: 'bla -la'
+    };
 
-// });
+    $scope.tabs = [{
+        title: 'Dynamic Title 1',
+        content: 'Dynamic content 1'
+    }];
 
-function CarouselDemoCtrl($scope) {
-
-}
+});
